@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SALES_MANAGER
+  SALES_REP
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  WON
+  LOST
+}
+
+enum LeadSource {
+  WEBSITE
+  LINKEDIN
+  REFERRAL
+  COLD_EMAIL
+  EVENT
+  OTHER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(SALES_REP)
+  createdAt    DateTime @default(now())
+  deletedAt    DateTime?
+
+  assignedLeads Lead[]       @relation("AssignedTo")
+  createdLeads  Lead[]       @relation("CreatedBy")
+  notes         Note[]
+  attachments   Attachment[]
+}
+
+model Lead {
+  id           String     @id @default(cuid())
+  name         String
+  company      String
+  email        String
+  phone        String?
+  source       LeadSource @default(WEBSITE)
+  status       LeadStatus @default(NEW)
+  priority     Priority   @default(MEDIUM)
+  dealValue    Float      @default(0)
+  
+  assignedToId String?
+  assignedTo   User?      @relation("AssignedTo", fields: [assignedToId], references: [id])
+  
+  createdById  String
+  createdBy    User       @relation("CreatedBy", fields: [createdById], references: [id])
+  
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?  // soft delete — never hard delete
+
+  notes        Note[]
+  attachments  Attachment[]
+
+  @@index([status])
+  @@index([assignedToId])
+  @@index([deletedAt])
+}
+
+model Note {
+  id          String   @id @default(cuid())
+  content     String
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id])
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Attachment {
+  id            String   @id @default(cuid())
+  filename      String
+  url           String
+  cloudinaryId  String
+  leadId        String
+  lead          Lead     @relation(fields: [leadId], references: [id])
+  uploadedById  String
+  uploadedBy    User     @relation(fields: [uploadedById], references: [id])
+  createdAt     DateTime @default(now())
+}

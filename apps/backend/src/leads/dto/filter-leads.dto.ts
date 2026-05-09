@@ -1,0 +1,37 @@
+import { IsEnum, IsOptional, IsString, IsInt, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import { LeadSource, LeadStatus, Priority } from '@prisma/client';
+
+export class FilterLeadsDto {
+  @IsOptional()
+  @IsEnum(LeadStatus)
+  status?: LeadStatus;
+
+  @IsOptional()
+  @IsEnum(LeadSource)
+  source?: LeadSource;
+
+  @IsOptional()
+  @IsEnum(Priority)
+  priority?: Priority;
+
+  @IsOptional()
+  @IsString()
+  assignedToId?: string;
+
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  limit?: number = 20;
+}
