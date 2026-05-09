@@ -1,0 +1,8 @@
+{
+  "name": "crm-app",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "cd apps/frontend && npm run dev",
+    "dev:backend": "cd apps/backend && npm run start:dev"
+  }
+}
