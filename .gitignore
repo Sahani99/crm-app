@@ -19,3 +19,5 @@ npm-debug.log*
 
 # Prisma
 prisma.config.ts
+.next/
+dist/
